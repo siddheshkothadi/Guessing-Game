@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 // No. of rounds in the game
 #define ROUNDS 4
@@ -83,9 +84,9 @@ Player *acceptInfo(int playerNumber)
     // Allocating memory to a pointer of type Player
     Player *player = (Player *)malloc(sizeof(struct Player));
 
-    printf("\n\tEnter the name of the Player #%d : ", playerNumber+1);
+    printf("\n\tEnter the name of the Player #%d : ", playerNumber + 1);
     player->name = (char *)malloc(100);
-    scanf("%s", player->name);
+    scanf(" %[^\n]s", player->name); //includes space in input and removes stray \n from input buffer
 
     // Initializing the score to 0
     player->score = 0;
@@ -103,70 +104,85 @@ Player *createCLL(int numberOfPlayers)
     for (int i = 0; i < numberOfPlayers; ++i)
     {
         player = acceptInfo(i);
-        if(head==NULL){
+        if (head == NULL)
+        {
             head = player;
             temp = head;
         }
-        else{
+        else
+        {
             temp->next = player;
             temp = temp->next;
         }
     }
-    temp->next = head;
+    temp->next = head; //Circular linked list
     return head;
 }
 
-int generateRandomNumber(int lowerLimit, int upperLimit){
+int generateRandomNumber(int lowerLimit, int upperLimit)
+{
+    time_t t;
+    /* Intializes random number generator */
+    srand((unsigned)time(&t));
     return (rand() % (upperLimit - lowerLimit + 1)) + 1;
 }
 
-void showLeaderboard(Player *head){
+void showLeaderboard(Player *head)
+{
     printf("\n\tHere's what the leaderboard looks like : \n");
     printf("\n\tNo.\tName\tScore\n");
     Player *temp = head;
-    int i=0;
-    do{
+    int i = 0;
+    do
+    {
         printf("\n\t%d\t%s\t%d", ++i, temp->name, temp->score);
         temp = temp->next;
-    }while(temp!=head);
+    } while (temp != head);
 }
 
-void playRound(Player *head, int roundNo){
+void playRound(Player *head, int roundNo)
+{
     int randomNumber = generateRandomNumber(LOWER_LIMIT, UPPER_LIMIT);
     Player *temp = head;
-    printf("\n\n\t\t\t================  Round #%d  ================", roundNo+1);
-    do{
+    printf("\n\n\t\t\t================  Round #%d  ================", roundNo + 1);
+    do
+    {
         printf("\n\n\tIt\'s %s\'s turn : ", temp->name);
         printf("\n\t\tGuess a number between %d and %d : ", LOWER_LIMIT, UPPER_LIMIT);
         scanf("%d", &temp->guess);
         printf("\tNoted your guess %s!", temp->name);
         temp->score += abs(randomNumber - temp->guess);
         temp = temp->next;
-    }while(temp!=head);
+    } while (temp != head);
     printf("\n\n\tDrum Rolls......\n\tThe number was : %d", randomNumber);
     printf("\n\n\t\t\t============= End of the Round ==============\n\n");
 }
 
-Player *getWinner(Player *head){
+Player *getWinner(Player *head)
+{
     // Score can't be negative, so assigning -1 initially
     int min_score = __INT_MAX__;
     Player *winner = NULL;
     Player *temp = head;
 
-    do{
-        if(temp->score < min_score){
+    do
+    {
+        if (temp->score < min_score)
+        {
             min_score = temp->score;
             winner = temp;
         }
         temp = temp->next;
-    }while(temp!=head);
+    } while (temp != head);
 
     return winner;
 }
 
-void playGame(Player *head){
+void playGame(Player *head)
+{
     Player *winner = NULL;
-    for(int i=0; i<ROUNDS; ++i){
+    for (int i = 0; i < ROUNDS; ++i)
+    {
         playRound(head, i);
         showLeaderboard(head);
     }
