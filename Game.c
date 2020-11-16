@@ -39,7 +39,10 @@ void playRound(Player *head, int roundNo);
 Player *getWinner(Player *head);
 
 // Root function to start the game
-void playGame(Player *head);
+void playGame(Player *head, int numberOfPlayers);
+
+//Returns Winners with same score
+Player **getWinners(Player *head, Player **winners, Player *winner, int *NoOfWinners);
 
 int main()
 {
@@ -63,7 +66,7 @@ int main()
             printf("\n\tEnter the number of players : ");
             scanf("%d", &numberOfPlayers);
             head = createCLL(numberOfPlayers);
-            playGame(head);
+            playGame(head, numberOfPlayers);
             break;
 
         case 2:
@@ -79,13 +82,13 @@ int main()
     return 0;
 }
 
-Player *acceptInfo(int playerNumber)
+Player *acceptInfo(int playerNumber) // Get Player's Information
 {
     // Allocating memory to a pointer of type Player
     Player *player = (Player *)malloc(sizeof(struct Player));
 
     printf("\n\tEnter the name of the Player #%d : ", playerNumber + 1);
-    player->name = (char *)malloc(100);
+    player->name = (char *)malloc(100 * sizeof(char));
     scanf(" %[^\n]s", player->name); //includes space in input and removes stray \n from input buffer
 
     // Initializing the score to 0
@@ -96,7 +99,7 @@ Player *acceptInfo(int playerNumber)
     return player;
 }
 
-Player *createCLL(int numberOfPlayers)
+Player *createCLL(int numberOfPlayers) // Create a circular linked list based on the number of players playing the game
 {
     Player *head = NULL;
     Player *temp = NULL;
@@ -119,7 +122,7 @@ Player *createCLL(int numberOfPlayers)
     return head;
 }
 
-int generateRandomNumber(int lowerLimit, int upperLimit)
+int generateRandomNumber(int lowerLimit, int upperLimit) // Returns the random number within the given range
 {
     time_t t;
     /* Intializes random number generator */
@@ -127,7 +130,7 @@ int generateRandomNumber(int lowerLimit, int upperLimit)
     return (rand() % (upperLimit - lowerLimit + 1)) + 1;
 }
 
-void showLeaderboard(Player *head)
+void showLeaderboard(Player *head) // To display the leaderboard after each roundNo
 {
     printf("\n\tHere's what the leaderboard looks like : \n");
     printf("\n\tNo.\tName\tScore\n");
@@ -140,7 +143,7 @@ void showLeaderboard(Player *head)
     } while (temp != head);
 }
 
-void playRound(Player *head, int roundNo)
+void playRound(Player *head, int roundNo) // Called on each round
 {
     int randomNumber = generateRandomNumber(LOWER_LIMIT, UPPER_LIMIT);
     Player *temp = head;
@@ -158,9 +161,9 @@ void playRound(Player *head, int roundNo)
     printf("\n\n\t\t\t============= End of the Round ==============\n\n");
 }
 
-Player *getWinner(Player *head)
+Player *getWinner(Player *head) // Returns the winner at the end of the game
 {
-    // Score can't be negative, so assigning -1 initially
+    // Score can't be negative, so assigning Maximum value initially
     int min_score = __INT_MAX__;
     Player *winner = NULL;
     Player *temp = head;
@@ -178,14 +181,34 @@ Player *getWinner(Player *head)
     return winner;
 }
 
-void playGame(Player *head)
+Player **getWinners(Player *head, Player **winners, Player *winner, int *NoOfWinners) //Returns Winners with same score
+{
+    Player *temp = head;
+    do
+    {
+        if (winner->score == temp->score)
+        {
+            winners[(*NoOfWinners)++] = temp;
+        }
+        temp = temp->next;
+    } while (temp != head);
+    return winners;
+}
+void playGame(Player *head, int numberOfPlayers) // Root function to start the game
 {
     Player *winner = NULL;
+    Player **winners = (Player **)malloc(numberOfPlayers * sizeof(Player *));
     for (int i = 0; i < ROUNDS; ++i)
     {
         playRound(head, i);
         showLeaderboard(head);
     }
     winner = getWinner(head);
-    printf("\n\n\tCongrats %s!!!\n\tYou've won the game with a score of %d\n\n", winner->name, winner->score);
+    int NoOfWinners = 0;
+    winners = getWinners(head, winners, winner, &NoOfWinners);
+    printf("\n\n\tTotal Winners are: %d\n\n", NoOfWinners);
+    for (int w = 0; w < NoOfWinners; w++)
+    {
+        printf("\n\n\tCongrats %s!!!\n\tYou're the Winner with a score of %d\n\n", winners[w]->name, winners[w]->score);
+    }
 }
