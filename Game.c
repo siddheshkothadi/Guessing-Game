@@ -63,8 +63,15 @@ int main()
         switch (choice_1)
         {
         case 1:
-            printf("\n\tEnter the number of players : ");
-            scanf("%d", &numberOfPlayers);
+            do
+            {
+                printf("\n\tEnter the number of players : ");
+                scanf("%d", &numberOfPlayers);
+                if (numberOfPlayers < 2) //checking for minimum no. of players
+                {
+                    printf("\n\n\tMinimum Number of players should be 2.\n\n");
+                }
+            } while (numberOfPlayers < 2);
             head = createCLL(numberOfPlayers);
             playGame(head, numberOfPlayers);
             break;
