@@ -1,6 +1,8 @@
+// For input and output (contains printf and scanf)
 #include <stdio.h>
+// Includes NULL, malloc, abs, rand and srand definitions
 #include <stdlib.h>
-#include <string.h>
+// time_t stores calendar time
 #include <time.h>
 
 // No. of rounds in the game
@@ -51,7 +53,6 @@ int main()
     int choice_1 = -1;
 
     int numberOfPlayers;
-    int lowerLimit, upperLimit;
 
     // Head of the circular linked list
     Player *head = NULL;
